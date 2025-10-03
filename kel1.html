@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Online | Bacilicious</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F5F5DC;
+            color: #3C091C;
+        }
+        .header {
+            background-color: #800000;
+            padding: 20px;
+            text-align: center;
+            color: #FFFAEE;
+            border-bottom: 2px solid #5C0000;
+        }
+        .header h1 {
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 2px;
+        }
+        .nav {
+            background-color: #5C0000;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .nav a {
+            color: #F5F5DC;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: #FFFAEE;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #FFFAEE;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+        .product-card {
+            background-color: #FDF9EC;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .product-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .product-card h3 {
+            color: #800000;
+            margin-top: 10px;
+        }
+        .product-card p {
+            color: #5C0000;
+        }
+        .product-card .price {
+            font-weight: bold;
+            color: #B22222;
+            font-size: 1.2em;
+        }
+        .add-to-cart {
+            background-color: #800000;
+            color: #FFFAEE;
+            border: none;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .add-to-cart:hover {
+            background-color: #B22222;
+            transform: scale(1.05);
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            color: #5C0000;
+            font-size: 0.9em;
+        }
+
+        /* Styling for Cart Page */
+        .cart-container {
+            background-color: #FFFAEE;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        .cart-container h2 {
+            text-align: center;
+            color: #800000;
+            margin-bottom: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+        .item-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .item-info h4 {
+            margin: 0;
+            color: #800000;
+        }
+        .item-info p {
+            margin: 5px 0 0 0;
+            color: #5C0000;
+        }
+        .item-controls {
+            display: flex;
+            align-items: center;
+        }
+        .item-controls button {
+            background-color: #B22222;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .item-controls button:hover {
+            background-color: #800000;
+        }
+        .item-controls span {
+            margin: 0 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .cart-summary {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #800000;
+        }
+        .cart-summary p {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .checkout-button {
+            width: 100%;
+            background-color: #800000;
+            color: #FFFAEE;
+            border: none;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+        }
+        .checkout-button:hover {
+            background-color: #B22222;
+            transform: translateY(-2px);
+        }
+        
+        /* Styling for Checkout Page (unchanged) */
+        .checkout-container {
+            background-color: #FFFAEE;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            margin: 40px auto;
+        }
+        .checkout-container h2 {
+            text-align: center;
+            color: #800000;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #5C0000;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #B22222;
+            border-radius: 5px;
+            background-color: #FDF9EC;
+            color: #3C091C;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #800000;
+            box-shadow: 0 0 8px rgba(128, 0, 0, 0.3);
+        }
+        .checkout-summary {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #800000;
+        }
+        .checkout-summary p {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1em;
+        }
+        .checkout-summary .total {
+            font-weight: bold;
+            color: #B22222;
+            font-size: 1.3em;
+        }
+        .submit-button {
+            width: 100%;
+            background-color: #800000;
+            color: #FFFAEE;
+            border: none;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+        }
+        .submit-button:hover {
+            background-color: #B22222;
+            transform: translateY(-2px);
+        }
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #5C0000;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .back-button:hover {
+            color: #800000;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>─────────── ∙ ~ε Bacilicious з~ ∙ ───────────</h1>
+    </div>
+    <div class="nav">
+        <a href="#home">Beranda</a>
+        <a href="#cart">Keranjang (<span id="cart-count">0</span>)</a>
+    </div>
+
+    <div id="home-section" class="container">
+        <h2 id="produk" style="text-align: center; color: #800000;">Koleksi Terbaru</h2>
+        <div class="product-grid">
+            <div class="product-card" data-id="1" data-name="Bacil Skena" data-price="4000" data-image="https://i.pinimg.com/1200x/b0/0a/89/b00a895163a704d1ad6a19e7a249a9a6.jpg">
+                <img src="https://i.pinimg.com/1200x/b0/0a/89/b00a895163a704d1ad6a19e7a249a9a6.jpg" alt="Bacil Skena">
+                <h3>Bacil Skena</h3>
+                <p>Bacil dengan varian original dan pedas.</p>
+                <div class="price">Rp 4.000</div>
+                <button class="add-to-cart">Tambah ke Keranjang</button>
+            </div>
+            <div class="product-card" data-id="2" data-name="Makroni Starboy" data-price="4000" data-image="https://i.pinimg.com/736x/52/2c/de/522cde0c1da9f581c3fb237840d7f5dd.jpg">
+                <img src="https://i.pinimg.com/736x/52/2c/de/522cde0c1da9f581c3fb237840d7f5dd.jpg" alt="Makroni Starboy">
+                <h3>Makroni Starboy</h3>
+                <p>Makroni rebus dengan bumbu bebas.</p>
+                <div class="price">Rp 4.000</div>
+                <button class="add-to-cart">Tambah ke Keranjang</button>
+            </div>
+            <div class="product-card" data-id="3" data-name="Pangsit Kalcer" data-price="4000" data-image="https://i.pinimg.com/1200x/1f/80/6e/1f806efdb8da3f8b3701fd756f9744b5.jpg">
+                <img src="https://i.pinimg.com/1200x/1f/80/6e/1f806efdb8da3f8b3701fd756f9744b5.jpg" alt="Pangsit Kalcer">
+                <h3>Pangsit Kalcer</h3>
+                <p>Pangsit dengan campuran daun jeruk dan cabai.</p>
+                <div class="price">Rp 4.000</div>
+                <button class="add-to-cart">Tambah ke Keranjang</button>
+            </div>
+            <div class="product-card" data-id="4" data-name="Bacang Pemda" data-price="2500" data-image="https://i.pinimg.com/1200x/e1/0b/c2/e10bc2065663aa52c6e45ad3c6484b2e.jpg">
+                <img src="https://i.pinimg.com/1200x/e1/0b/c2/e10bc2065663aa52c6e45ad3c6484b2e.jpg" alt="Pangsit Kalcer">
+                <h3>Bacang Pemda</h3>
+                <p>Bacang hangat untuk sarapan khusus untuk jam 07.00-10.00.</p>
+                <div class="price">Rp 2.500</div>
+                <button class="add-to-cart">Tambah ke Keranjang</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-section" class="cart-container" style="display: none;">
+        <h2>Keranjang Belanja</h2>
+        <div id="cart-items">
+            </div>
+        <div class="cart-summary">
+            <p><span>Total Belanja:</span> <span id="cart-total-price">Rp 0</span></p>
+        </div>
+        <a href="#checkout" id="go-to-checkout" class="checkout-button" style="display: none;">Lanjut ke Pembayaran</a>
+        <p id="empty-cart-message" style="text-align: center; color: #5C0000; font-style: italic;">Keranjang Anda kosong.</p>
+        <a href="#home" class="back-button">Kembali ke Beranda</a>
+    </div>
+
+    <div id="checkout-section" class="checkout-container" style="display: none;">
+        <h2>Pembayaran</h2>
+        <form id="checkout-form">
+            <div class="form-group">
+                <label for="nama">Nama Lengkap</label>
+                <input type="text" id="nama" name="nama" required>
+            </div>
+            <div class="form-group">
+                <label for="kelas">Kelas</label>
+                <input type="text" id="kelas" name="kelas" required>
+            </div>
+            <div class="form-group">
+                <label for="catatan">Catatan(pedas/ori)</label>
+                <input type="text" id="catatan" name="catatan">
+            </div>
+            <div class="checkout-summary">
+                <p><span>Total Pembayaran:</span> <span id="checkout-total-price">Rp 0</span></p>
+            </div>
+            <a href="#" id="wa-link" class="submit-button">Bayar Sekarang</a>
+            <a href="#cart" class="back-button">Kembali ke Keranjang</a>
+        </form>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Bacilicious. Hak Cipta Dilindungi.</p>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const homeSection = document.getElementById('home-section');
+            const cartSection = document.getElementById('cart-section');
+            const checkoutSection = document.getElementById('checkout-section');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCountElement = document.getElementById('cart-count');
+            const cartTotalPriceElement = document.getElementById('cart-total-price');
+            const checkoutTotalPriceElement = document.getElementById('checkout-total-price');
+            const waLink = document.getElementById('wa-link');
+            const goToCheckoutButton = document.getElementById('go-to-checkout');
+            const emptyCartMessage = document.getElementById('empty-cart-message');
+            const nomorAdmin = "6289530095175";
+            let cart = [];
+
+            // Fungsi untuk menampilkan/menyembunyikan halaman
+            function showSection(sectionId) {
+                homeSection.style.display = 'none';
+                cartSection.style.display = 'none';
+                checkoutSection.style.display = 'none';
+                document.getElementById(sectionId + '-section').style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+
+            // Fungsi untuk memperbarui tampilan keranjang dan total harga
+            function updateCartView() {
+                cartItemsContainer.innerHTML = '';
+                let totalPrice = 0;
+                cart.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="item-info">
+                            <h4>${item.name}</h4>
+                            <p>Rp ${item.price.toLocaleString('id-ID')}</p>
+                        </div>
+                        <div class="item-controls">
+                            <button class="decrease" data-id="${item.id}">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="increase" data-id="${item.id}">+</button>
+                        </div>
+                    `;
+                    cartItemsContainer.appendChild(itemElement);
+                    totalPrice += item.price * item.quantity;
+                });
+
+                cartCountElement.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+                cartTotalPriceElement.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+                checkoutTotalPriceElement.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+                
+                if (cart.length > 0) {
+                    goToCheckoutButton.style.display = 'block';
+                    emptyCartMessage.style.display = 'none';
+                } else {
+                    goToCheckoutButton.style.display = 'none';
+                    emptyCartMessage.style.display = 'block';
+                }
+            }
+
+            // Event listener untuk tombol 'Tambah ke Keranjang'
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productCard = e.target.closest('.product-card');
+                    const id = productCard.getAttribute('data-id');
+                    const name = productCard.getAttribute('data-name');
+                    const price = parseInt(productCard.getAttribute('data-price'));
+                    const image = productCard.getAttribute('data-image');
+
+                    const existingItem = cart.find(item => item.id === id);
+                    if (existingItem) {
+                        existingItem.quantity++;
+                    } else {
+                        cart.push({ id, name, price, image, quantity: 1 });
+                    }
+                    updateCartView();
+                });
+            });
+
+            // Event listener untuk tombol + dan - di keranjang
+            cartItemsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('increase')) {
+                    const id = e.target.getAttribute('data-id');
+                    const item = cart.find(i => i.id === id);
+                    if (item) {
+                        item.quantity++;
+                        updateCartView();
+                    }
+                } else if (e.target.classList.contains('decrease')) {
+                    const id = e.target.getAttribute('data-id');
+                    const itemIndex = cart.findIndex(i => i.id === id);
+                    if (itemIndex > -1) {
+                        cart[itemIndex].quantity--;
+                        if (cart[itemIndex].quantity <= 0) {
+                            cart.splice(itemIndex, 1);
+                        }
+                        updateCartView();
+                    }
+                }
+            });
+
+            // Event listener untuk navigasi
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.target.getAttribute('href').substring(1);
+                    showSection(targetId);
+                });
+            });
+
+            // Event listener untuk tombol Bayar Sekarang (WhatsApp)
+            waLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const nama = document.getElementById('nama').value;
+                const kelas = document.getElementById('kelas').value;
+                const catatan = document.getElementById('catatan').value;
+
+                if (nama && kelas) {
+                    let pesan = `Halo, saya ingin memesan produk berikut:\n\n`;
+                    let totalHarga = 0;
+                    cart.forEach(item => {
+                        pesan += `* ${item.name} (${item.quantity} pcs) - Rp ${item.price.toLocaleString('id-ID')}\n`;
+                        totalHarga += item.price * item.quantity;
+                    });
+                    
+                    pesan += `\n*Total Harga:* Rp ${totalHarga.toLocaleString('id-ID')}`;
+                    
+                    pesan += `\n\n*Data Pengiriman:*\n*Nama:* ${nama}\n*Kelas:* ${kelas}\n`;
+                    if (catatan) {
+                        pesan += `*Catatan:* ${catatan}\n`;
+                    }
+                    
+                    const urlWa = `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesan)}`;
+                    window.open(urlWa, '_blank');
+                } else {
+                    alert("Mohon lengkapi Nama dan Kelas terlebih dahulu.");
+                }
+            });
+
+            // Tampilkan halaman home saat pertama kali dimuat
+            showSection('home');
+        });
+    </script>
+</body>
+  </html>
