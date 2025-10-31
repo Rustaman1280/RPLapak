@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Risol & Piscok — Portrait Overlay</title>
+  <meta name="description" content="Risol keemasan & Piscok lumer. Portrait hero dengan tombol melayang di dalam foto. Pesan via WhatsApp." />
+  <style>
+    :root{
+      /* Risol: warm golden */
+      --risol-1:#FFF1D6; --risol-2:#FFC76A; --risol-3:#F39B3D; --risol-4:#B85D00;
+      /* Piscok: banana + cocoa */
+      --piscok-1:#FFF7CF; --piscok-2:#F5E36B; --piscok-3:#5A4334; --piscok-4:#2C1F1B;
+      --ink:#18181b; --muted:#6b7280; --bg:#fffaf3; --glass:#ffffffb3; --glass-dark:#00000033;
+      --radius:22px; --shadow:0 12px 28px rgba(0,0,0,.14), 0 4px 10px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      color:var(--ink); background:linear-gradient(180deg,#fffaf3, #fff3db 40%, #fffaf3);
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+
+    /* ===== Decorative floating dots (small animations) ===== */
+    .decor{position:fixed; inset:0; pointer-events:none; z-index:0}
+    .dot{position:absolute; width:8px; height:8px; border-radius:50%; opacity:.15; filter:blur(.2px)}
+    .d1{background:var(--risol-3)} .d2{background:var(--risol-2)} .d3{background:var(--piscok-3)} .d4{background:var(--piscok-2)}
+    @keyframes floaty{0%{transform:translateY(0) translateX(0)}50%{transform:translateY(-12px) translateX(6px)}100%{transform:translateY(0) translateX(0)}}
+    .dot{animation:floaty 6s ease-in-out infinite}
+
+    /* ===== Layout ===== */
+    .wrap{max-width:860px;margin:0 auto;padding:16px 18px 28px; position:relative; z-index:1}
+
+    /* ===== Portrait Card ===== */
+    .card{position:relative;border-radius:var(--radius);isolation:isolate;box-shadow:var(--shadow);overflow:hidden;background:#fff;margin-bottom:18px}
+    .photo{position:relative;aspect-ratio:3/4; width:100%;
+      --img:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="%23FFD187"/><stop offset="1" stop-color="%23F4A259"/></linearGradient></defs><rect width="600" height="800" fill="url(%23g)"/><g fill="%23fff" opacity=".25"><circle cx="90" cy="120" r="40"/><circle cx="520" cy="220" r="28"/><circle cx="170" cy="680" r="34"/></g></svg>');
+      background:
+        radial-gradient(800px 400px at 110% -10%, var(--glass) 0%, transparent 50%),
+        radial-gradient(800px 400px at -10% 110%, var(--glass) 0%, transparent 55%),
+        var(--img);
+      background-size:cover; background-position:center; filter:saturate(1.02)
+    }
+
+    /* Replace images here (or inline style on .photo) */
+    .card[data-type="risol"] .photo{--img: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="%23FFF1D6"/><stop offset="1" stop-color="%23FFC76A"/></linearGradient></defs><rect width="600" height="800" fill="url(%23g)"/><g opacity=".2" fill="%23B85D00"><rect x="80" y="120" width="420" height="220" rx="38"/><rect x="120" y="430" width="360" height="220" rx="38"/></g></svg>')}
+    .card[data-type="piscok"] .photo{--img: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="%23FFF7CF"/><stop offset="1" stop-color="%235A4334"/></linearGradient></defs><rect width="600" height="800" fill="url(%23g)"/><g opacity=".2" fill="%232C1F1B"><circle cx="150" cy="200" r="120"/><circle cx="430" cy="520" r="150"/></g></svg>')}
+
+    /* ===== In-photo overlays ===== */
+    .overlay{position:absolute;inset:0;display:grid;grid-template-rows:1fr auto auto auto;gap:10px;padding:16px}
+    .glass{backdrop-filter: blur(8px);background:linear-gradient(180deg,#ffffffcc,#ffffff88);border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:var(--shadow)}
+    .title{align-self:end;max-width:92%;padding:10px 14px;font-weight:900;font-size:clamp(18px,6vw,28px);line-height:1.12}
+    .title small{display:block;font-weight:700;color:var(--muted);font-size:.7em}
+
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 12px;border-radius:999px;border:1px solid rgba(0,0,0,.08);background:#fff9;backdrop-filter:blur(6px);font-weight:800}
+
+    .actions{display:flex;gap:10px}
+    .btn{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:none;border-radius:14px;font-weight:900;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s, box-shadow .2s}
+    .btn:active{transform:translateY(1px)}
+    .btn-risol{background:linear-gradient(180deg,var(--risol-2),var(--risol-3));color:#4a2e00}
+    .btn-piscok{background:linear-gradient(180deg,var(--piscok-2),var(--piscok-3));color:#fff4d6}
+    .btn-ghost{background:#fff}
+
+    /* Floating accent chips (decor inside photo) */
+    .float{position:absolute;padding:8px 10px;border-radius:12px;font-weight:800;color:#fff;mix-blend:overlay;filter:drop-shadow(0 6px 18px rgba(0,0,0,.25));opacity:.92}
+    .f1{left:12px;top:12px;background:linear-gradient(180deg,var(--risol-3),var(--risol-2))}
+    .f2{right:12px;top:14px;background:linear-gradient(180deg,var(--piscok-3),var(--piscok-2))}
+    .f3{right:16px;bottom:18px;background:linear-gradient(180deg,#111,#333);opacity:.5}
+
+    /* Tag line area below (optional text outside photo) */
+    .desc{padding:14px 16px 18px}
+    .desc p{margin:0;color:#5b5245}
+
+    /* Subtle motion */
+    @keyframes glide{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .float{animation:glide 4s ease-in-out infinite}
+    .card:hover .float{animation-duration:3s}
+
+    /* Footer */
+    footer{padding:18px 18px 28px;color:#645a4f;text-align:center}
+
+    /* ===== Floating Replace Controls ===== */
+    .fab{position:fixed; right:16px; bottom:16px; z-index:30}
+    .fab button{border:none;border-radius:999px;padding:14px 16px;font-weight:900;box-shadow:var(--shadow);cursor:pointer}
+    .fab-main{background:linear-gradient(180deg,var(--risol-2),var(--piscok-2))}
+    .fab-panel{position:absolute; right:0; bottom:60px; display:none; flex-direction:column; gap:8px}
+    .fab.open .fab-panel{display:flex}
+    .fab .mini{border-radius:12px; padding:10px 12px; background:#fff}
+    .fab .mini strong{display:block}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px;text-align:center}
+
+    .drop-hint{position:absolute; inset:0; display:none; place-items:center; background:rgba(255,255,255,.35); backdrop-filter:blur(2px); font-weight:900}
+    .card.dragover .drop-hint{display:grid}
+  </style>
+</head>
+<body>
+  <!-- Small decorative animated dots -->
+  <div class="decor" aria-hidden="true">
+    <span class="dot d1" style="left:6%; top:12%; animation-duration:7s"></span>
+    <span class="dot d2" style="left:78%; top:8%; animation-duration:8s"></span>
+    <span class="dot d3" style="left:90%; top:46%; animation-duration:6.2s"></span>
+    <span class="dot d4" style="left:8%; top:72%; animation-duration:7.4s"></span>
+    <span class="dot d1" style="left:40%; top:88%; animation-duration:8.2s"></span>
+  </div>
+
+  <main class="wrap">
+
+    <!-- ===== RISOL (atas) ===== -->
+    <article id="risol" class="card" data-type="risol">
+      <div class="photo"></div>
+      <div class="drop-hint">Lepas gambar di sini untuk ganti foto Risol</div>
+      <!-- Floating labels inside the photo -->
+      <span class="float f1">Renyah 🍤</span>
+      <span class="float f2">Keemasan ✨</span>
+      <span class="float f3">Best Seller</span>
+
+      <div class="overlay">
+        <div></div>
+        <div class="title glass">Risol Premium <small>Keju Mayo • Smoke Beef</small></div>
+        <div class="chips">
+          <span class="chip">Rp2.000</span>
+          <span class="chip">Goreng Fresh</span>
+          <span class="chip">Bisa Pedas 🌶️</span>
+        </div>
+        <div class="actions">
+          <a class="btn btn-risol" data-product="Risol Premium" href="#">Pesan via WhatsApp</a>
+          <button class="btn btn-ghost" data-info="Risol Premium">Detail</button>
+        </div>
+      </div>
+      <div class="desc"><p>Kulit tipis krispi, isian melimpah. Pas untuk sarapan & camilan sore.</p></div>
+    </article>
+
+    <!-- ===== PISCOK (bawah, vertikal) ===== -->
+    <article id="piscok" class="card" data-type="piscok">
+      <div class="photo"></div>
+      <div class="drop-hint">Lepas gambar di sini untuk ganti foto Piscok</div>
+      <span class="float f1" style="background:linear-gradient(180deg,var(--piscok-3),var(--piscok-2))">Lumer 🍫</span>
+      <span class="float f2" style="background:linear-gradient(180deg,var(--risol-3),var(--risol-2))">Manis 🍌</span>
+      <span class="float f3">Favorit</span>
+
+      <div class="overlay">
+        <div></div>
+        <div class="title glass">Piscok Lumer <small>Pisang Matang • Cokelat Pekat</small></div>
+        <div class="chips">
+          <span class="chip">Rp1.000</span>
+          <span class="chip">Pisangnya Manis</span>
+          <span class="chip">Cokelat Banyak</span>
+        </div>
+        <div class="actions">
+          <a class="btn btn-piscok" data-product="Piscok Lumer" href="#">Pesan via WhatsApp</a>
+          <button class="btn btn-ghost" data-info="Piscok Lumer">Detail</button>
+        </div>
+      </div>
+      <div class="desc"><p>Camilan legit: pisang hangat bertemu cokelat lumer. Mood booster!</p></div>
+    </article>
+
+    <p class="hint">Tip: Kamu bisa <strong>drag & drop</strong> foto ke masing-masing kartu, atau pakai tombol ⚙️ di kanan bawah untuk unggah/paste URL.</p>
+  </main>
+
+  <!-- Floating controls: change photos -->
+  <div class="fab" aria-label="Ganti Foto">
+    <button class="fab-main">⚙️ Ganti Foto</button>
+    <div class="fab-panel">
+      <label class="mini"><strong>Risol</strong>
+        <input id="file-risol" type="file" accept="image/*" hidden>
+        <button data-pick="risol">Unggah</button>
+        <button data-url="risol">Pakai URL</button>
+      </label>
+      <label class="mini"><strong>Piscok</strong>
+        <input id="file-piscok" type="file" accept="image/*" hidden>
+        <button data-pick="piscok">Unggah</button>
+        <button data-url="piscok">Pakai URL</button>
+      </label>
+    </div>
+  </div>
+
+  <footer>© <span id="y"></span> Risol x Piscok — Portrait Overlay</footer>
+
+  <script>
+    const WA_NUMBER = "6287842320302"; // +62 878-4232-0302
+    function wa(product){
+      const msg = encodeURIComponent(`Halo! Saya mau pesan ${product}. Boleh info ready & total?`);
+      return `https://wa.me/${WA_NUMBER}?text=${msg}`;
+    }
+
+    // Attach order buttons
+    document.querySelectorAll('.actions a.btn').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const p = a.getAttribute('data-product') || 'Order';
+        location.href = wa(p);
+      });
+    });
+
+    // Simple detail pop
+    document.querySelectorAll('button[data-info]').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const p = b.getAttribute('data-info');
+        alert(`${p} — Info singkat:
+• Bisa request level manis/pedas
+• Minimal order fleksibel
+• Bisa antar sekitar sekolah/rumah`);
+      });
+    });
+
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Tiny parallax
+    const cards = document.querySelectorAll('.card');
+    function tilt(x,y,el){ el.style.transform = `perspective(900px) rotateY(${x*6}deg) rotateX(${y*-6}deg)`; }
+    cards.forEach(card=>{
+      card.addEventListener('mousemove', e=>{
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left)/r.width - .5; 
+        const y = (e.clientY - r.top)/r.height - .5;
+        tilt(x,y,card);
+      });
+      card.addEventListener('mouseleave', ()=> card.style.transform='');
+    });
+    if(window.DeviceOrientationEvent){
+      window.addEventListener('deviceorientation', (ev)=>{
+        const x = Math.max(-.5, Math.min(.5, (ev.gamma||0)/45));
+        const y = Math.max(-.5, Math.min(.5, (ev.beta||0)/45));
+        cards.forEach(c=>tilt(x/2,y/2,c));
+      });
+    }
+
+    // ====== Change Photo (Upload / URL / DragDrop) ======
+    const map = {
+      risol: document.querySelector('#risol .photo'),
+      piscok: document.querySelector('#piscok .photo')
+    };
+    function setPhoto(target, src){
+      if(!map[target]) return;
+      map[target].style.setProperty('--img', `url('${src}')`);
+    }
+    // Upload buttons
+    document.querySelectorAll('[data-pick]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.getAttribute('data-pick');
+        const input = document.getElementById('file-'+key);
+        input.click();
+      });
+    });
+    // File inputs
+    function readFileToURL(file, cb){
+      const r = new FileReader();
+      r.onload = ()=> cb(r.result);
+      r.readAsDataURL(file);
+    }
+    document.getElementById('file-risol').addEventListener('change', e=>{
+      const f = e.target.files[0]; if(!f) return; readFileToURL(f, url=> setPhoto('risol', url));
+    });
+    document.getElementById('file-piscok').addEventListener('change', e=>{
+      const f = e.target.files[0]; if(!f) return; readFileToURL(f, url=> setPhoto('piscok', url));
+    });
+    // URL buttons
+    document.querySelectorAll('[data-url]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.getAttribute('data-url');
+        const url = prompt('Tempel URL gambar (format JPG/PNG/WebP):');
+        if(url){ setPhoto(key, url); }
+      });
+    });
+    // FAB toggle
+    const fab = document.querySelector('.fab');
+    document.querySelector('.fab-main').addEventListener('click', ()=> fab.classList.toggle('open'));
+
+    // Drag & Drop per-card
+    function enableDrop(cardId){
+      const card = document.getElementById(cardId);
+      const photo = card.querySelector('.photo');
+      card.addEventListener('dragover', (e)=>{ e.preventDefault(); card.classList.add('dragover'); });
+      card.addEventListener('dragleave', ()=> card.classList.remove('dragover'));
+      card.addEventListener('drop', (e)=>{
+        e.preventDefault(); card.classList.remove('dragover');
+        const f = e.dataTransfer.files && e.dataTransfer.files[0];
+        if(f && f.type.startsWith('image/')){ readFileToURL(f, url=> photo.style.setProperty('--img', `url('${url}')`)); }
+      });
+    }
+    enableDrop('risol');
+    enableDrop('piscok');
+  </script>
+</body>
+</html>
